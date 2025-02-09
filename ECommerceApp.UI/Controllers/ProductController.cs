@@ -13,10 +13,14 @@ namespace ECommerceApp.UI.Controllers
             _productService = productService;
         }
 
+
+        private static string lastHigherValue = "";
+        private static string lastAzValue = "";
+
         public async Task<IActionResult> Index(int page = 1, int category = 0, bool isAZ = false, bool isHigherToLower = false)
         {
             var items = await _productService.GetAllByCategoryId(category);
-            var pageSize = 5;
+            var pageSize = 10;
             var model = new ProductListViewModel
             {
                 Products = items.Skip((page - 1) * pageSize).Take(pageSize).ToList(),
@@ -27,45 +31,27 @@ namespace ECommerceApp.UI.Controllers
                 isAz = isAZ,
                 isHigherToLower = isHigherToLower
             };
-            if (isAZ)
+
+            if (isHigherToLower.ToString() != lastHigherValue)
             {
                 if (!isHigherToLower)
                 {
-                    model.Products = model.Products.OrderBy(a => a.ProductName).ToList();
+                    model.Products = model.Products.OrderBy(a => a.UnitPrice).ToList();
                 }
                 else { model.Products = model.Products.OrderByDescending(a => a.UnitPrice).ToList(); }
+                lastHigherValue = isHigherToLower.ToString();
             }
-            else
-            {
-                if (!isHigherToLower)
-                {
-                    model.Products = model.Products.OrderByDescending(a => a.ProductName).ToList();
-                }
-                else
-                {
-                    model.Products =model.Products.OrderBy(a => a.UnitPrice).ToList();
-                }
-            }
-            if (isHigherToLower)
-            {
-                if (!isAZ)
-                {
-                    model.Products = model.Products.OrderByDescending(a => a.UnitPrice).ToList();
-                }
-                else { model.Products = model.Products.OrderBy(a => a.ProductName).ToList(); }
 
-            }
-            else
+            if (isAZ.ToString() != lastAzValue)
             {
                 if (!isAZ)
                 {
                     model.Products = model.Products.OrderBy(a => a.ProductName).ToList();
                 }
-                else
-                {
-                    model.Products = model.Products.OrderByDescending( a => a.ProductName).ToList();
-                }
+                else { model.Products = model.Products.OrderByDescending(a => a.ProductName).ToList(); }
+                lastAzValue = isAZ.ToString();
             }
+
             return View(model);
         }
 
@@ -74,7 +60,7 @@ namespace ECommerceApp.UI.Controllers
             var items = await _productService.GetAllAsync();
             var model = new ProductListViewModel
             {
-                 Products = items,
+                Products = items,
             };
             model.Products = model.Products.OrderBy(a => a.UnitPrice).ToList();
             return Ok(model.Products.Select(a => a.UnitPrice));

@@ -22,6 +22,15 @@ namespace ECommerceApp.UI.TagHelpers
             if (PageCount > 1)
             {
                 sb.Append("<ul class='pagination'>");
+                if (CurrentPage > 1)
+                {
+                    sb.AppendFormat("<li><a class='page-link' href='/product/index?page={0}&category={1}'>Previous</a></li>",CurrentPage - 1,CurrentCategory);
+                }
+
+                else
+                {
+                    sb.Append("<li class='page-item disabled'><span class='page-link'>Previous</span></li>");
+                }
 
                 for (int i = 1; i <=PageCount; i++) {
                     sb.AppendFormat("<li class='{0}'>",(i==CurrentPage) ? "page-item active":"page-item");
@@ -30,7 +39,13 @@ namespace ECommerceApp.UI.TagHelpers
 
                     sb.AppendFormat("</li>");
                 }
-
+                if (CurrentPage < PageCount)
+                {
+                    sb.AppendFormat("<li><a class='page-link' href='/product/index?page={0}&category={1}'>Next</a></li>", CurrentPage + 1, CurrentCategory);
+                }
+                else {
+                    sb.Append("<li class='page-item disabled'><span class='page-link'>Next</span></li>");
+                }
                 sb.Append("</ul>");
             }
 
